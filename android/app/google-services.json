@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "52184306944",
+    "project_id": "learn-react-native-dee20",
+    "storage_bucket": "learn-react-native-dee20.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:52184306944:android:3f17250cfac3eced9e4fe5",
+        "android_client_info": {
+          "package_name": "com.react_native_firebase"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCUMFiQezVlPJ8ou7hAGCaVxNGPgQhcNIU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
