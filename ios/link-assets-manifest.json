@@ -1,0 +1,29 @@
+{
+  "migIndex": 1,
+  "data": [
+    {
+      "path": "assets/fonts/AnnapurnaSIL-Bold.ttf",
+      "sha1": "ef1989bd8ba58d67f9d879cb4da5a152a6e2dd99"
+    },
+    {
+      "path": "assets/fonts/AnnapurnaSIL-Regular.ttf",
+      "sha1": "10166ef455bfce0073d561a16c35a810ca15bcc3"
+    },
+    {
+      "path": "assets/fonts/KodeMono-Bold.ttf",
+      "sha1": "d514ea15fa1a9a132c491b700a1daaab9ed51a1e"
+    },
+    {
+      "path": "assets/fonts/KodeMono-Medium.ttf",
+      "sha1": "97ba5761a1f53c0c05dc26c0945d5dddb5e42412"
+    },
+    {
+      "path": "assets/fonts/KodeMono-Regular.ttf",
+      "sha1": "0feb55a20a28b18a79fca6e49686fd19f3c79fc8"
+    },
+    {
+      "path": "assets/fonts/KodeMono-SemiBold.ttf",
+      "sha1": "8b6ad9cfeab063a256ebb19a16700c600b0938c2"
+    }
+  ]
+}
