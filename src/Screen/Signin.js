@@ -36,6 +36,14 @@ const Signin = ({navigation}) => {
         auth()
           .signInWithEmailAndPassword(email, password)
           .then(res => {
+            const id = res.user.uid;
+            AsyncStorage.setItem('UserId', id)
+              .then(() => {
+                console.log('successfully set UserId!');
+              })
+              .catch(error => {
+                console.log('Error  in setting userID: ', error);
+              });
             AsyncStorage.setItem('sessionToken', '12345');
             navigation.navigate('DrawerNavigators');
             ToastAndroid.show('User signin successfully!', ToastAndroid.SHORT);

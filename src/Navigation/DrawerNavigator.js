@@ -12,8 +12,20 @@ const Drawer = createDrawerNavigator();
 const DrawerNavigators = ({navigation}) => {
   const signout = async () => {
     try {
-      await AsyncStorage.removeItem('sessionToken');
-      console.log('AsyncStorage item "id" has been removed.');
+      await AsyncStorage.removeItem('sessionToken')
+        .then(() => {
+          console.log('successfully sessionToken remove!');
+        })
+        .catch(error => {
+          console.log('Error in remove sessionToken: ', error);
+        });
+      await AsyncStorage.removeItem('UserId')
+        .then(() => {
+          console.log('successfully set UserId remove!');
+        })
+        .catch(error => {
+          console.log('Error in remove userID: ', error);
+        });
       navigation.navigate('Signin');
     } catch (error) {
       console.error('Error removing AsyncStorage item:', error);
