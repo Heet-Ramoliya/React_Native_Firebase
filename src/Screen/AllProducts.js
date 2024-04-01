@@ -5,7 +5,15 @@ import {FlatList, TouchableOpacity} from 'react-native-gesture-handler';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useFocusEffect} from '@react-navigation/native';
 import {db} from '../Firebase/Config';
-import {collection, getDocs} from 'firebase/firestore';
+import {
+  addDoc,
+  collection,
+  doc,
+  getDocs,
+  updateDoc,
+  query,
+  where,
+} from 'firebase/firestore';
 
 const AllProducts = ({navigation}) => {
   const [allProduct, setAllproduct] = useState([]);
@@ -17,7 +25,7 @@ const AllProducts = ({navigation}) => {
 
   useEffect(() => {
     console.log('allproducts ==> ', storedUserId);
-  }, [allProduct, storedUserId]);
+  }, [allProduct, storedUserId, cartitems]);
 
   const getData = () => {
     getDocs(collection(db, 'Products')).then(docSnap => {
@@ -40,55 +48,91 @@ const AllProducts = ({navigation}) => {
     }
   };
 
+  const getCartItems = async () => {
+    try {
+      const querySnapshot = await getDocs(
+        query(collection(db, 'CartItems'), where('userid', '==', storedUserId)),
+      );
+
+      const products = [];
+      querySnapshot.forEach(doc => {
+        products.push(doc.data());
+      });
+
+      setCartitems(products);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
+
   useFocusEffect(
     React.useCallback(() => {
       getUserIdFromStorage();
+      getCartItems();
       // getAllProducts();
       getData();
     }, []),
   );
 
-  // const increase = async (id, item) => {
-  //   setLoading(true);
+  const increase = async (id, item) => {
+    setLoading(true);
 
-  //   const updatedCount = (count[id] || 0) + 1;
-  //   setCount(prevCounts => ({...prevCounts, [id]: updatedCount}));
+    const updatedCount = (count[id] || 0) + 1;
+    setCount(prevCounts => ({...prevCounts, [id]: updatedCount}));
 
-  //   const existingCartItem = cartitems.find(
-  //     cartItem => cartItem.productId === item.id,
-  //   );
+    console.log('cartitems ==> ', cartitems);
 
-  //   if (existingCartItem) {
-  //     const updatedCartItems = cartitems.map(cartItem =>
-  //       cartItem.productId === item.id
-  //         ? {...cartItem, quantity: updatedCount}
-  //         : cartItem,
-  //     );
-  //     setCartitems(updatedCartItems);
+    const existingCartItem = cartitems.find(
+      cartItem => cartItem.productid === item.id,
+    );
+    console.log('existingCartItem ==> ', existingCartItem);
 
-  //     try {
-  //       await updateCartItem(updatedCount, storedUserId, item.id);
-  //       setSelectedProductId(item.id);
-  //     } catch (error) {
-  //       console.error('Error updating cart item:', error);
-  //     }
-  //   } else {
-  //     try {
-  //       await insertIntoCartItems(
-  //         storedUserId,
-  //         item.id,
-  //         item.name,
-  //         item.price,
-  //         item.image,
-  //         updatedCount,
-  //       );
-  //       setSelectedProductId(item.id);
-  //     } catch (error) {
-  //       console.error('Error inserting cart item:', error);
-  //     }
-  //   }
-  //   setLoading(false);
-  // };
+    if (existingCartItem) {
+      console.log('in the existingcartitems conditiond');
+      const updatedCartItems = cartitems.map(cartItem =>
+        cartItem.productid === item.id
+          ? {...cartItem, quantity: updatedCount}
+          : cartItem,
+      );
+      setCartitems(updatedCartItems);
+
+      try {
+        await updateDoc(collection(db, 'CartItems'), {
+          quantity: updatedCount,
+        })
+          .then(() => {
+            console.log('product update successfully!');
+          })
+          .catch(error => {
+            console.log('error ==> ', error);
+          });
+        setSelectedProductId(item.id);
+      } catch (error) {
+        console.error('Error updating cart item:', error);
+      }
+    } else {
+      try {
+        await addDoc(collection(db, 'CartItems'), {
+          userid: storedUserId,
+          productid: item.id,
+          name: item.name,
+          price: item.price,
+          image: item.image,
+          quantity: updatedCount,
+        })
+          .then(() => {
+            console.log('product insert into cart successfully!');
+          })
+          .catch(error => {
+            console.log('error ==> ', error);
+          });
+        setSelectedProductId(item.id);
+      } catch (error) {
+        console.error('Error inserting cart item:', error);
+      }
+    }
+    setLoading(false);
+  };
 
   // const decrease = async (id, item) => {
   //   const updatedCount = Math.max((count[id] || 0) - 1, 0);
@@ -177,13 +221,13 @@ const AllProducts = ({navigation}) => {
                           color: 'black',
                           fontSize: 18,
                         }}>
-                        0{/* {count[item.id] || 0} */}
+                        {count[item.id] || 0}
                       </Text>
                     </View>
                     <TouchableOpacity
-                      // onPress={() => {
-                      //   increase(item.id, item);
-                      // }}
+                      onPress={() => {
+                        increase(item.id, item);
+                      }}
                       style={styles.button}>
                       <Text
                         style={{
