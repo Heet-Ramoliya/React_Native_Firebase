@@ -24,7 +24,8 @@ const AllProducts = ({navigation}) => {
   const [count, setCount] = useState({});
 
   useEffect(() => {
-    console.log('allproducts ==> ', storedUserId);
+    getData();
+    getCartItems();
   }, [allProduct, storedUserId, cartitems]);
 
   const getData = () => {
@@ -68,45 +69,94 @@ const AllProducts = ({navigation}) => {
   useFocusEffect(
     React.useCallback(() => {
       getUserIdFromStorage();
-      getCartItems();
-      // getAllProducts();
-      getData();
     }, []),
   );
 
+  // console.log('cartitems ==> ', cartitems);
+
+  // const increase = async (id, item) => {
+  //   setLoading(true);
+
+  //   const updatedCount = (count[id] || 0) + 1;
+  //   setCount(prevCounts => ({...prevCounts, [id]: updatedCount}));
+
+  //   const existingCartItem = cartitems.find(
+  //     console.log('in the existingCartItem'),
+  //     cartItem => cartItem.productid == item.id,
+  //     console.log('item.id ==> ', item.id),
+  //     console.log('cartItem id ==>', cartitems.productid),
+  //   );
+
+  //   if (existingCartItem) {
+  //     console.log('in the existingcartitems conditiond');
+  //     const updatedCartItems = cartitems.map(cartItem =>
+  //       cartItem.productid == item.id
+  //         ? {...cartItem, quantity: updatedCount}
+  //         : cartItem,
+  //     );
+  //     setCartitems(updatedCartItems);
+
+  //     try {
+  //       await updateDoc(collection(db, 'CartItems'), {
+  //         quantity: updatedCount,
+  //       })
+  //         .then(() => {
+  //           console.log('product update successfully!');
+  //         })
+  //         .catch(error => {
+  //           console.log('error ==> ', error);
+  //         });
+  //       setSelectedProductId(item.id);
+  //     } catch (error) {
+  //       console.error('Error updating cart item:', error);
+  //     }
+  //   } else {
+  //     try {
+  //       await addDoc(collection(db, 'CartItems'), {
+  //         userid: storedUserId,
+  //         productid: item.id,
+  //         name: item.name,
+  //         price: item.price,
+  //         image: item.image,
+  //         quantity: updatedCount,
+  //       })
+  //         .then(() => {
+  //           console.log('product insert into cart successfully!');
+  //         })
+  //         .catch(error => {
+  //           console.log('error ==> ', error);
+  //         });
+  //       setSelectedProductId(item.id);
+  //     } catch (error) {
+  //       console.error('Error inserting cart item:', error);
+  //     }
+  //   }
+  //   setLoading(false);
+  // };
   const increase = async (id, item) => {
     setLoading(true);
 
     const updatedCount = (count[id] || 0) + 1;
     setCount(prevCounts => ({...prevCounts, [id]: updatedCount}));
 
-    console.log('cartitems ==> ', cartitems);
-
     const existingCartItem = cartitems.find(
       cartItem => cartItem.productid === item.id,
     );
-    console.log('existingCartItem ==> ', existingCartItem);
 
     if (existingCartItem) {
-      console.log('in the existingcartitems conditiond');
       const updatedCartItems = cartitems.map(cartItem =>
         cartItem.productid === item.id
           ? {...cartItem, quantity: updatedCount}
           : cartItem,
       );
+
       setCartitems(updatedCartItems);
 
       try {
-        await updateDoc(collection(db, 'CartItems'), {
+        await updateDoc(doc(db, 'CartItems', existingCartItem.id), {
           quantity: updatedCount,
-        })
-          .then(() => {
-            console.log('product update successfully!');
-          })
-          .catch(error => {
-            console.log('error ==> ', error);
-          });
-        setSelectedProductId(item.id);
+        });
+        console.log('Cart item updated successfully!');
       } catch (error) {
         console.error('Error updating cart item:', error);
       }
@@ -119,16 +169,10 @@ const AllProducts = ({navigation}) => {
           price: item.price,
           image: item.image,
           quantity: updatedCount,
-        })
-          .then(() => {
-            console.log('product insert into cart successfully!');
-          })
-          .catch(error => {
-            console.log('error ==> ', error);
-          });
-        setSelectedProductId(item.id);
+        });
+        console.log('Product added to cart successfully!');
       } catch (error) {
-        console.error('Error inserting cart item:', error);
+        console.error('Error adding product to cart:', error);
       }
     }
     setLoading(false);
