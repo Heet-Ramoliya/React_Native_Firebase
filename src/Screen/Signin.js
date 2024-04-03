@@ -37,6 +37,8 @@ const Signin = ({navigation}) => {
           .signInWithEmailAndPassword(email, password)
           .then(res => {
             const id = res.user.uid;
+            const emailname = res.user.email;
+            console.log('email ==>', emailname);
             AsyncStorage.setItem('UserId', id)
               .then(() => {
                 console.log('successfully set UserId!');
@@ -45,7 +47,9 @@ const Signin = ({navigation}) => {
                 console.log('Error  in setting userID: ', error);
               });
             AsyncStorage.setItem('sessionToken', '12345');
-            navigation.navigate('DrawerNavigators');
+            navigation.navigate('DrawerNavigators', {
+              email: emailname,
+            });
             ToastAndroid.show('User signin successfully!', ToastAndroid.SHORT);
           })
           .catch(error => {

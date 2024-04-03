@@ -6,10 +6,14 @@ import {View} from 'react-native';
 import TabNavigator from './TabNavigator';
 import AddItems from '../Screen/AddItems';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useRoute} from '@react-navigation/native';
+import MyOrders from '../Screen/MyOrders';
 
 const Drawer = createDrawerNavigator();
 
 const DrawerNavigators = ({navigation}) => {
+  const route = useRoute();
+  const email = route.params?.email;
   const signout = async () => {
     try {
       await AsyncStorage.removeItem('sessionToken')
@@ -41,7 +45,10 @@ const DrawerNavigators = ({navigation}) => {
           headerRight: () => (
             <>
               <View style={{flexDirection: 'row'}}>
-                <TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => {
+                    navigation.navigate('AddToCart');
+                  }}>
                   <Icon
                     name="shopping-cart"
                     size={30}
@@ -63,6 +70,7 @@ const DrawerNavigators = ({navigation}) => {
         }}
       />
       <Drawer.Screen name="AddItems" component={AddItems} />
+      <Drawer.Screen name="MyOrders" component={MyOrders} />
     </Drawer.Navigator>
   );
 };

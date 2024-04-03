@@ -11,6 +11,9 @@ import TabNavigator from './TabNavigator';
 import AllProducts from '../Screen/AllProducts';
 import MyProduct from '../Screen/MyProduct';
 import AddItems from '../Screen/AddItems';
+import AddToCart from '../Screen/AddToCart';
+import Invoice from '../Screen/Invoice';
+import MyOrders from '../Screen/MyOrders';
 
 const Stack = createNativeStackNavigator();
 
@@ -69,6 +72,21 @@ const StackNavigator = () => {
           name="AddItems"
           component={AddItems}
           options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="AddToCart"
+          component={AddToCart}
+          options={{headerShown: true}}
+        />
+        <Stack.Screen
+          name="Invoice"
+          component={Invoice}
+          options={{headerShown: true}}
+        />
+        <Stack.Screen
+          name="MyOrders"
+          component={MyOrders}
+          options={{headerShown: true}}
         />
       </Stack.Navigator>
     </NavigationContainer>

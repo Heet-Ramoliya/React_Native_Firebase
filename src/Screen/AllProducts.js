@@ -13,6 +13,7 @@ import {
   updateDoc,
   query,
   where,
+  deleteDoc,
 } from 'firebase/firestore';
 
 const AllProducts = ({navigation}) => {
@@ -22,11 +23,7 @@ const AllProducts = ({navigation}) => {
   const [selectedProductId, setSelectedProductId] = useState('');
   const [loading, setLoading] = useState(false);
   const [count, setCount] = useState({});
-
-  useEffect(() => {
-    getData();
-    getCartItems();
-  }, [allProduct, storedUserId, cartitems]);
+  const [quantitycount, setQuantitycount] = useState('');
 
   const getData = () => {
     getDocs(collection(db, 'Products')).then(docSnap => {
@@ -37,6 +34,51 @@ const AllProducts = ({navigation}) => {
       });
     });
   };
+
+  useEffect(() => {}, [cartitems]);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      getData();
+      getUserIdFromStorage();
+    }, []),
+  );
+
+  // const getData = async () => {
+  //   try {
+  //     const productsSnapshot = await getDocs(collection(db, 'Products'));
+  //     let products = [];
+  //     productsSnapshot.forEach(doc => {
+  //       products.push({...doc.data(), id: doc.id});
+  //     });
+  //     setAllproduct(products);
+
+  //     const cartSnapshot = await getDocs(
+  //       query(collection(db, 'CartItems'), where('userid', '==', storedUserId)),
+  //     );
+  //     const fetchedCartItems = [];
+  //     cartSnapshot.forEach(doc => {
+  //       fetchedCartItems.push({...doc.data(), id: doc.id});
+  //     });
+
+  //     const initialCounts = {};
+  //     products.forEach(product => {
+  //       const existingCartItem = fetchedCartItems.find(
+  //         cartItem => cartItem.productid === product.id,
+  //       );
+  //       if (existingCartItem) {
+  //         initialCounts[product.id] = existingCartItem.quantity;
+  //       } else {
+  //         initialCounts[product.id] = 0;
+  //       }
+  //     });
+  //     setCount(initialCounts);
+  //   } catch (error) {
+  //     console.error('Error fetching data:', error);
+  //   }
+  // };
+
+  console.log('UserId ==> ', storedUserId);
 
   const getUserIdFromStorage = async () => {
     try {
@@ -49,119 +91,40 @@ const AllProducts = ({navigation}) => {
     }
   };
 
-  const getCartItems = async () => {
-    try {
-      const querySnapshot = await getDocs(
-        query(collection(db, 'CartItems'), where('userid', '==', storedUserId)),
-      );
-
-      const products = [];
-      querySnapshot.forEach(doc => {
-        products.push(doc.data());
-      });
-
-      setCartitems(products);
-    } catch (error) {
-      console.error('Error fetching data:', error);
-    }
-  };
-
-  useFocusEffect(
-    React.useCallback(() => {
-      getUserIdFromStorage();
-    }, []),
-  );
-
-  // console.log('cartitems ==> ', cartitems);
-
-  // const increase = async (id, item) => {
-  //   setLoading(true);
-
-  //   const updatedCount = (count[id] || 0) + 1;
-  //   setCount(prevCounts => ({...prevCounts, [id]: updatedCount}));
-
-  //   const existingCartItem = cartitems.find(
-  //     console.log('in the existingCartItem'),
-  //     cartItem => cartItem.productid == item.id,
-  //     console.log('item.id ==> ', item.id),
-  //     console.log('cartItem id ==>', cartitems.productid),
-  //   );
-
-  //   if (existingCartItem) {
-  //     console.log('in the existingcartitems conditiond');
-  //     const updatedCartItems = cartitems.map(cartItem =>
-  //       cartItem.productid == item.id
-  //         ? {...cartItem, quantity: updatedCount}
-  //         : cartItem,
-  //     );
-  //     setCartitems(updatedCartItems);
-
-  //     try {
-  //       await updateDoc(collection(db, 'CartItems'), {
-  //         quantity: updatedCount,
-  //       })
-  //         .then(() => {
-  //           console.log('product update successfully!');
-  //         })
-  //         .catch(error => {
-  //           console.log('error ==> ', error);
-  //         });
-  //       setSelectedProductId(item.id);
-  //     } catch (error) {
-  //       console.error('Error updating cart item:', error);
-  //     }
-  //   } else {
-  //     try {
-  //       await addDoc(collection(db, 'CartItems'), {
-  //         userid: storedUserId,
-  //         productid: item.id,
-  //         name: item.name,
-  //         price: item.price,
-  //         image: item.image,
-  //         quantity: updatedCount,
-  //       })
-  //         .then(() => {
-  //           console.log('product insert into cart successfully!');
-  //         })
-  //         .catch(error => {
-  //           console.log('error ==> ', error);
-  //         });
-  //       setSelectedProductId(item.id);
-  //     } catch (error) {
-  //       console.error('Error inserting cart item:', error);
-  //     }
-  //   }
-  //   setLoading(false);
-  // };
   const increase = async (id, item) => {
     setLoading(true);
 
     const updatedCount = (count[id] || 0) + 1;
     setCount(prevCounts => ({...prevCounts, [id]: updatedCount}));
 
-    const existingCartItem = cartitems.find(
-      cartItem => cartItem.productid === item.id,
-    );
+    try {
+      const querySnapshot = await getDocs(
+        query(collection(db, 'CartItems'), where('userid', '==', storedUserId)),
+      );
+      const fetchedCartItems = [];
+      querySnapshot.forEach(doc => {
+        fetchedCartItems.push({...doc.data(), id: doc.id});
+      });
 
-    if (existingCartItem) {
-      const updatedCartItems = cartitems.map(cartItem =>
-        cartItem.productid === item.id
-          ? {...cartItem, quantity: updatedCount}
-          : cartItem,
+      setCartitems(fetchedCartItems);
+
+      const existingCartItem = fetchedCartItems.find(
+        cartItem => cartItem.productid === item.id,
       );
 
-      setCartitems(updatedCartItems);
+      if (existingCartItem) {
+        const updatedCartItems = [...fetchedCartItems];
+        const existingCartItemIndex = updatedCartItems.findIndex(
+          cartItem => cartItem.productid === item.id,
+        );
+        updatedCartItems[existingCartItemIndex].quantity = updatedCount;
+        setCartitems(updatedCartItems);
 
-      try {
         await updateDoc(doc(db, 'CartItems', existingCartItem.id), {
           quantity: updatedCount,
         });
-        console.log('Cart item updated successfully!');
-      } catch (error) {
-        console.error('Error updating cart item:', error);
-      }
-    } else {
-      try {
+        console.log('Product quantity updated successfully!');
+      } else {
         await addDoc(collection(db, 'CartItems'), {
           userid: storedUserId,
           productid: item.id,
@@ -170,40 +133,57 @@ const AllProducts = ({navigation}) => {
           image: item.image,
           quantity: updatedCount,
         });
-        console.log('Product added to cart successfully!');
-      } catch (error) {
-        console.error('Error adding product to cart:', error);
+        console.log('Product inserted into cart successfully!');
       }
+    } catch (error) {
+      console.error('Error updating cart item:', error);
     }
+
     setLoading(false);
   };
 
-  // const decrease = async (id, item) => {
-  //   const updatedCount = Math.max((count[id] || 0) - 1, 0);
-  //   setCount(prevCounts => ({...prevCounts, [id]: updatedCount}));
+  const decrease = async (id, item) => {
+    const updatedCount = Math.max((count[id] || 0) - 1, 0);
+    setCount(prevCounts => ({...prevCounts, [id]: updatedCount}));
 
-  //   const existingCartItem = cartitems.find(
-  //     cartItem => cartItem.productId === item.id,
-  //   );
+    try {
+      const querySnapshot = await getDocs(
+        query(collection(db, 'CartItems'), where('userid', '==', storedUserId)),
+      );
+      const fetchedCartItems = [];
+      querySnapshot.forEach(doc => {
+        fetchedCartItems.push({...doc.data(), id: doc.id});
+      });
 
-  //   if (existingCartItem) {
-  //     if (updatedCount === 0) {
-  //       const updatedCartItems = cartitems.filter(
-  //         cartItem => cartItem.productId !== item.id,
-  //       );
-  //       setCartitems(updatedCartItems);
-  //       await deleteCartItem(storedUserId, item.id);
-  //     } else {
-  //       const updatedCartItems = cartitems.map((cartItem, index) =>
-  //         index === existingCartItem
-  //           ? {...cartItem, quantity: updatedCount}
-  //           : cartItem,
-  //       );
-  //       setCartitems(updatedCartItems);
-  //       await updateCartItem(updatedCount, storedUserId, item.id);
-  //     }
-  //   }
-  // };
+      const existingCartItem = fetchedCartItems.find(
+        cartItem => cartItem.productid === item.id,
+      );
+
+      if (existingCartItem) {
+        if (updatedCount === 0) {
+          const updatedCartItems = fetchedCartItems.filter(
+            cartItem => cartItem.productid !== item.id,
+          );
+          setCartitems(updatedCartItems);
+          await deleteDoc(doc(db, 'CartItems', existingCartItem.id));
+          console.log('Product removed from cart successfully!');
+        } else {
+          const updatedCartItems = fetchedCartItems.map(cartItem =>
+            cartItem.productid === item.id
+              ? {...cartItem, quantity: updatedCount}
+              : cartItem,
+          );
+          setCartitems(updatedCartItems);
+          await updateDoc(doc(db, 'CartItems', existingCartItem.id), {
+            quantity: updatedCount,
+          });
+          console.log('Product quantity updated successfully!');
+        }
+      }
+    } catch (error) {
+      console.error('Error updating cart item:', error);
+    }
+  };
 
   return (
     <View>
@@ -237,7 +217,7 @@ const AllProducts = ({navigation}) => {
                       justifyContent: 'center',
                     }}>
                     <TouchableOpacity
-                      // onPress={() => decrease(item.id, item)}
+                      onPress={() => decrease(item.id, item)}
                       style={styles.button}>
                       <Text
                         style={{
