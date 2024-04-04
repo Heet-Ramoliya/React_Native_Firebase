@@ -16,7 +16,7 @@ const AddItems = ({navigation}) => {
 
   useEffect(() => {
     console.log('storedUserId ==> ', storedUserId);
-  }, [storedUserId]);
+  }, [storedUserId, imgURL]);
 
   const handleSubmit = async () => {
     addDoc(collection(db, 'Products'), {

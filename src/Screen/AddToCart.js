@@ -19,7 +19,6 @@ import {
   doc,
 } from 'firebase/firestore';
 import {db} from '../Firebase/Config';
-import {async} from '@firebase/util';
 
 const AddToCart = ({navigation}) => {
   const [cartitems, setCartitems] = useState([]);

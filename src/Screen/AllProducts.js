@@ -1,6 +1,6 @@
 import React from 'react';
 import {useEffect, useState, useCallback} from 'react';
-import {View, Text, Image, StyleSheet} from 'react-native';
+import {View, Text, Image, StyleSheet, Alert} from 'react-native';
 import {FlatList, TouchableOpacity} from 'react-native-gesture-handler';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useFocusEffect} from '@react-navigation/native';
@@ -15,6 +15,7 @@ import {
   where,
   deleteDoc,
 } from 'firebase/firestore';
+import messaging from '@react-native-firebase/messaging';
 
 const AllProducts = ({navigation}) => {
   const [allProduct, setAllproduct] = useState([]);
@@ -25,8 +26,32 @@ const AllProducts = ({navigation}) => {
   const [count, setCount] = useState({});
   const [quantitycount, setQuantitycount] = useState('');
 
-  const getData = () => {
-    getDocs(collection(db, 'Products')).then(docSnap => {
+  useEffect(() => {
+    getDeviceToken();
+  }, [cartitems]);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      getUserIdFromStorage();
+      getData();
+    }, []),
+  );
+
+  useEffect(() => {
+    const unsubscribe = messaging().onMessage(async remoteMessage => {
+      Alert.alert('A new FCM message arrived!', JSON.stringify(remoteMessage));
+    });
+
+    return unsubscribe;
+  }, []);
+
+  const getDeviceToken = async () => {
+    let DeviceToken = await messaging().getToken();
+    console.log('DeviceToken ==> ', DeviceToken);
+  };
+
+  const getData = async () => {
+    await getDocs(collection(db, 'Products')).then(docSnap => {
       let products = [];
       docSnap.forEach(doc => {
         products.push({...doc.data(), id: doc.id});
@@ -34,51 +59,6 @@ const AllProducts = ({navigation}) => {
       });
     });
   };
-
-  useEffect(() => {}, [cartitems]);
-
-  useFocusEffect(
-    React.useCallback(() => {
-      getData();
-      getUserIdFromStorage();
-    }, []),
-  );
-
-  // const getData = async () => {
-  //   try {
-  //     const productsSnapshot = await getDocs(collection(db, 'Products'));
-  //     let products = [];
-  //     productsSnapshot.forEach(doc => {
-  //       products.push({...doc.data(), id: doc.id});
-  //     });
-  //     setAllproduct(products);
-
-  //     const cartSnapshot = await getDocs(
-  //       query(collection(db, 'CartItems'), where('userid', '==', storedUserId)),
-  //     );
-  //     const fetchedCartItems = [];
-  //     cartSnapshot.forEach(doc => {
-  //       fetchedCartItems.push({...doc.data(), id: doc.id});
-  //     });
-
-  //     const initialCounts = {};
-  //     products.forEach(product => {
-  //       const existingCartItem = fetchedCartItems.find(
-  //         cartItem => cartItem.productid === product.id,
-  //       );
-  //       if (existingCartItem) {
-  //         initialCounts[product.id] = existingCartItem.quantity;
-  //       } else {
-  //         initialCounts[product.id] = 0;
-  //       }
-  //     });
-  //     setCount(initialCounts);
-  //   } catch (error) {
-  //     console.error('Error fetching data:', error);
-  //   }
-  // };
-
-  console.log('UserId ==> ', storedUserId);
 
   const getUserIdFromStorage = async () => {
     try {
