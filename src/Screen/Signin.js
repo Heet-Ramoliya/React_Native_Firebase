@@ -198,6 +198,30 @@ const Signin = ({navigation}) => {
             Register a new account here!
           </Text>
         </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => {
+            navigation.navigate('MobileVerification');
+          }}
+          style={{
+            paddingHorizontal: 10,
+            backgroundColor: 'white',
+            width: '90%',
+            marginLeft: 20,
+            marginRight: 20,
+            marginBottom: 20,
+            borderRadius: 30,
+          }}>
+          <Text
+            style={{
+              color: 'black',
+              fontSize: 17,
+              textAlign: 'center',
+              padding: 10,
+              fontWeight: '500',
+            }}>
+            Login with Mobile Number
+          </Text>
+        </TouchableOpacity>
       </View>
     </KeyboardAwareScrollView>
   );
@@ -211,7 +235,7 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: 'white',
     margin: 20,
-    marginTop: 70,
+    marginTop: 35,
     borderRadius: 12,
     paddingBottom: 16,
   },

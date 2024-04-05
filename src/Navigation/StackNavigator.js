@@ -14,6 +14,7 @@ import AddItems from '../Screen/AddItems';
 import AddToCart from '../Screen/AddToCart';
 import Invoice from '../Screen/Invoice';
 import MyOrders from '../Screen/MyOrders';
+import MobileVerification from '../Screen/MobileVerification';
 
 const Stack = createNativeStackNavigator();
 
@@ -87,6 +88,11 @@ const StackNavigator = () => {
           name="MyOrders"
           component={MyOrders}
           options={{headerShown: true}}
+        />
+        <Stack.Screen
+          name="MobileVerification"
+          component={MobileVerification}
+          options={{headerShown: true, title: 'Mobile Verification'}}
         />
       </Stack.Navigator>
     </NavigationContainer>
