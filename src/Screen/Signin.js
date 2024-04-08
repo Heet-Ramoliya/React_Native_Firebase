@@ -6,17 +6,30 @@ import {
   ToastAndroid,
   TouchableOpacity,
   Image,
+  Alert,
 } from 'react-native';
 import {useEffect, useState} from 'react';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import auth from '@react-native-firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {
+  GoogleSignin,
+  GoogleSigninButton,
+  statusCodes,
+} from '@react-native-google-signin/google-signin';
 
 const Signin = ({navigation}) => {
+  useEffect(() => {
+    GoogleSignin.configure({
+      webClientId:
+        '52184306944-30pfsdm4stb7lfdb3hl10uc06ui114hl.apps.googleusercontent.com',
+    });
+  }, []);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showpassword, setShowpassword] = useState(true);
+  const [userinfo, setUserinfo] = useState(null);
 
   const showPasswordonInputField = () => {
     setShowpassword(!showpassword);
@@ -30,6 +43,32 @@ const Signin = ({navigation}) => {
     navigateForget();
   };
 
+  const Googlelogin = async () => {
+    try {
+      await GoogleSignin.hasPlayServices();
+      const userInfo = await GoogleSignin.signIn()
+        .then(() => {
+          console.log('userInfo ==> ', userInfo);
+          console.log('successfully login using google!!');
+          navigation.navigate('DrawerNavigators');
+        })
+        .catch(error => {
+          console.log('error ==> ', error);
+        });
+      setUserinfo(userInfo);
+    } catch (error) {
+      if (error.code === statusCodes.SIGN_IN_CANCELLED) {
+        console.log(error);
+      } else if (error.code === statusCodes.IN_PROGRESS) {
+        console.log(error);
+      } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+        console.log(error);
+      } else {
+        console.log('else part');
+      }
+    }
+  };
+
   const handleSignin = () => {
     if (email != '' && password != '') {
       try {
@@ -38,7 +77,6 @@ const Signin = ({navigation}) => {
           .then(res => {
             const id = res.user.uid;
             const emailname = res.user.email;
-            console.log('email ==>', emailname);
             AsyncStorage.setItem('UserId', id)
               .then(() => {
                 console.log('successfully set UserId!');
@@ -83,6 +121,7 @@ const Signin = ({navigation}) => {
                 fontFamily: 'KodeMono-Bold',
                 color: 'black',
                 paddingTop: 13,
+                paddingRight: 8,
               }}>
               cookaroo
             </Text>
@@ -108,7 +147,7 @@ const Signin = ({navigation}) => {
 
             <TouchableOpacity
               onPress={showPasswordonInputField}
-              style={{width: '60%', paddingHorizontal: 10, marginTop: 5}}>
+              style={{width: '65%', paddingHorizontal: 10, marginTop: 5}}>
               <View
                 style={{
                   flexDirection: 'row',
@@ -157,7 +196,7 @@ const Signin = ({navigation}) => {
                 style={{
                   padding: 4,
                   marginTop: 10,
-                  width: '60%',
+                  width: '100%',
                   borderRadius: 80,
                   backgroundColor: 'rgba(236,240,245,255)',
                 }}
@@ -222,6 +261,22 @@ const Signin = ({navigation}) => {
             Login with Mobile Number
           </Text>
         </TouchableOpacity>
+        <GoogleSigninButton
+          style={{
+            paddingHorizontal: 10,
+            width: '90%',
+            marginLeft: 20,
+            marginRight: 20,
+            marginBottom: 20,
+            borderRadius: 30,
+          }}
+          size={GoogleSigninButton.Size.Wide}
+          color={GoogleSigninButton.Color.Dark}
+          onPress={() => {
+            Googlelogin();
+          }}
+          // disabled={this.state.isSigninInProgress}
+        />
       </View>
     </KeyboardAwareScrollView>
   );
@@ -243,6 +298,7 @@ const styles = StyleSheet.create({
     height: 65,
     width: 65,
     margin: 10,
+    marginTop: 22,
     borderRadius: 100,
   },
   child: {

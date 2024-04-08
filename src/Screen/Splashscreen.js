@@ -26,7 +26,7 @@ export default function SplashScreen({navigation}) {
 
   return (
     <>
-      <StatusBar hidden />
+      <StatusBar backgroundColor="black" />
       <View style={styles.main}>
         <Image
           source={require('../../assets/image/finalimage.png')}

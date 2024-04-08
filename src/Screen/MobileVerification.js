@@ -6,6 +6,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   Image,
+  ActivityIndicator,
 } from 'react-native';
 import auth from '@react-native-firebase/auth';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
@@ -15,44 +16,48 @@ const MobileVerification = ({navigation}) => {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [verificationId, setVerificationId] = useState('');
   const [code, setCode] = useState('');
-  const [changebutton, setChangeButton] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [showOtpField, setShowOtpField] = useState(false);
 
   const sendVerificationCode = async () => {
-    setChangeButton(true);
+    setLoading(true);
     try {
       const confirmation = await auth().signInWithPhoneNumber(phoneNumber);
-      console.log('confirmation ==> ', confirmation);
       setVerificationId(confirmation.verificationId);
+      setShowOtpField(true);
     } catch (error) {
       console.error('Error sending verification code:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
   const verifyCode = async () => {
+    setLoading(true);
     try {
       const credential = auth.PhoneAuthProvider.credential(
         verificationId,
         code,
       );
-      await auth()
-        .signInWithCredential(credential)
-        .then(() => {
-          AsyncStorage.setItem('sessionToken', '12345');
-          navigation.navigate('DrawerNavigators');
-        })
-        .catch(error => {
-          console.log('error ==> ', error);
-        });
-      console.log('Phone authentication successful');
+      const userCredential = await auth().signInWithCredential(credential);
+      const userId = userCredential.user.uid;
+      await AsyncStorage.setItem('UserId', userId).then(() => {
+        console.log('successfully set useris in AsyncStorage');
+      });
+      AsyncStorage.setItem('sessionToken', '12345').then(() => {
+        console.log('successfully set sessionToken in AsyncStorage');
+      });
+      navigation.navigate('DrawerNavigators');
     } catch (error) {
       console.error('Error verifying code:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <KeyboardAwareScrollView
-      style={{flexGrow: 1, backgroundColor: 'rgba(249,50,9,255)'}}>
+      style={{flex: 1, backgroundColor: 'rgba(249,50,9,255)'}}>
       <View style={styles.main}>
         <View style={styles.container}>
           <View style={styles.child}>
@@ -60,88 +65,38 @@ const MobileVerification = ({navigation}) => {
               source={require('../../assets/image/logo.jpg')}
               style={styles.img}
             />
-            <Text
-              style={{
-                fontSize: 40,
-                fontFamily: 'KodeMono-Bold',
-                color: 'black',
-                paddingTop: 13,
-              }}>
-              cookaroo
-            </Text>
+            <Text style={styles.title}>cookaroo</Text>
           </View>
 
           <View style={{paddingHorizontal: 10}}>
-            <View style={{marginTop: 20}}>
+            <TextInput
+              placeholder="Enter Phone Number"
+              placeholderTextColor="black"
+              style={styles.formField}
+              value={phoneNumber}
+              onChangeText={text => setPhoneNumber(text)}
+            />
+            {showOtpField && (
               <TextInput
-                placeholder="Enter Phone Number"
+                placeholder="Enter OTP"
                 placeholderTextColor="black"
-                style={styles.formfeild1}
-                value={phoneNumber}
-                onChangeText={text => setPhoneNumber(text)}
+                style={styles.formField}
+                value={code}
+                onChangeText={text => setCode(text)}
               />
-              {showOtpField == true ? (
-                <TextInput
-                  placeholder="Enter OTP"
-                  placeholderTextColor="black"
-                  style={styles.formfeild2}
-                  value={code}
-                  onChangeText={text => setCode(text)}
-                />
-              ) : null}
-            </View>
-
-            {changebutton == false ? (
-              <TouchableOpacity
-                onPress={() => {
-                  sendVerificationCode();
-                  setChangeButton(true);
-                  setShowOtpField(true);
-                }}
-                style={{
-                  padding: 4,
-                  backgroundColor: 'rgba(249,50,9,255)',
-                  borderRadius: 100,
-                  margin: 10,
-                  paddingHorizontal: 10,
-                  marginTop: 18,
-                }}>
-                <Text
-                  style={{
-                    fontSize: 18,
-                    color: 'white',
-                    textAlign: 'center',
-                    padding: 7,
-                    fontWeight: '600',
-                  }}>
-                  Send otp
-                </Text>
-              </TouchableOpacity>
-            ) : (
-              <TouchableOpacity
-                onPress={() => {
-                  verifyCode();
-                }}
-                style={{
-                  padding: 4,
-                  backgroundColor: 'rgba(249,50,9,255)',
-                  borderRadius: 100,
-                  margin: 10,
-                  paddingHorizontal: 10,
-                  marginTop: 18,
-                }}>
-                <Text
-                  style={{
-                    fontSize: 18,
-                    color: 'white',
-                    textAlign: 'center',
-                    padding: 7,
-                    fontWeight: '600',
-                  }}>
-                  submit
-                </Text>
-              </TouchableOpacity>
             )}
+
+            <TouchableOpacity
+              onPress={showOtpField ? verifyCode : sendVerificationCode}
+              style={styles.button}>
+              {loading ? (
+                <ActivityIndicator size="small" color="white" />
+              ) : (
+                <Text style={styles.buttonText}>
+                  {showOtpField ? 'Submit' : 'Send OTP'}
+                </Text>
+              )}
+            </TouchableOpacity>
           </View>
         </View>
       </View>
@@ -172,8 +127,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginTop: 20,
   },
-  formfeild1: {
-    margin: 8,
+  title: {
+    fontSize: 40,
+    fontFamily: 'KodeMono-Bold',
+    color: 'black',
+    paddingTop: 13,
+  },
+  formField: {
+    marginVertical: 8,
     padding: 10,
     backgroundColor: 'rgba(236,240,245,255)',
     fontSize: 15,
@@ -182,25 +143,17 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     color: 'black',
   },
-  formfeild2: {
-    margin: 8,
-    padding: 10,
-    backgroundColor: 'rgba(236,240,245,255)',
-    fontSize: 15,
-    borderRadius: 10,
-    height: 55,
-    fontWeight: '500',
-    color: 'black',
-  },
-  header: {
-    flexDirection: 'row',
-    backgroundColor: 'rgba(236,240,245,255)',
-    borderRadius: 10,
-    height: '18%',
+  button: {
+    padding: 12,
+    backgroundColor: 'rgba(249,50,9,255)',
+    borderRadius: 100,
+    marginVertical: 10,
     alignItems: 'center',
-    paddingHorizontal: 10,
-    marginHorizontal: 16,
-    marginTop: 22,
+  },
+  buttonText: {
+    fontSize: 18,
+    color: 'white',
+    fontWeight: '600',
   },
 });
 

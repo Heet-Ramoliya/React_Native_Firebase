@@ -1,6 +1,6 @@
 import React from 'react';
 import {useEffect, useState, useCallback} from 'react';
-import {View, Text, Image, StyleSheet, Alert} from 'react-native';
+import {View, Text, Image, StyleSheet, Alert, StatusBar} from 'react-native';
 import {FlatList, TouchableOpacity} from 'react-native-gesture-handler';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useFocusEffect} from '@react-navigation/native';
@@ -166,92 +166,95 @@ const AllProducts = ({navigation}) => {
   };
 
   return (
-    <View>
-      <FlatList
-        data={allProduct}
-        renderItem={({item}) => (
-          <>
-            <View>
-              <View style={styles.container}>
-                <View
-                  style={{
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}>
-                  <Image
-                    source={{uri: item.image}}
-                    style={{
-                      height: 120,
-                      width: 120,
-                      borderRadius: 20,
-                    }}
-                  />
-                </View>
-                <View style={styles.text_container}>
-                  <Text style={styles.pname}>{item.name}</Text>
-                  <Text style={styles.price}>₹{item.price}</Text>
+    <>
+      <StatusBar backgroundColor="black" />
+      <View>
+        <FlatList
+          data={allProduct}
+          renderItem={({item}) => (
+            <>
+              <View>
+                <View style={styles.container}>
                   <View
                     style={{
-                      flexDirection: 'row',
-                      padding: 5,
+                      alignItems: 'center',
                       justifyContent: 'center',
                     }}>
-                    <TouchableOpacity
-                      onPress={() => decrease(item.id, item)}
-                      style={styles.button}>
-                      <Text
-                        style={{
-                          fontWeight: 'bold',
-                          color: 'black',
-                          padding: 5,
-                          fontSize: 18,
-                        }}>
-                        -
-                      </Text>
-                    </TouchableOpacity>
+                    <Image
+                      source={{uri: item.image}}
+                      style={{
+                        height: 120,
+                        width: 120,
+                        borderRadius: 20,
+                      }}
+                    />
+                  </View>
+                  <View style={styles.text_container}>
+                    <Text style={styles.pname}>{item.name}</Text>
+                    <Text style={styles.price}>₹{item.price}</Text>
                     <View
                       style={{
-                        height: 50,
-                        width: 40,
-                        alignItems: 'center',
+                        flexDirection: 'row',
+                        padding: 5,
                         justifyContent: 'center',
-                        borderRadius: 25,
-                        marginLeft: 7,
-                        marginRight: 7,
                       }}>
-                      <Text
+                      <TouchableOpacity
+                        onPress={() => decrease(item.id, item)}
+                        style={styles.button}>
+                        <Text
+                          style={{
+                            fontWeight: 'bold',
+                            color: 'black',
+                            padding: 5,
+                            fontSize: 18,
+                          }}>
+                          -
+                        </Text>
+                      </TouchableOpacity>
+                      <View
                         style={{
-                          fontWeight: 'bold',
-                          color: 'black',
-                          fontSize: 18,
+                          height: 50,
+                          width: 40,
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          borderRadius: 25,
+                          marginLeft: 7,
+                          marginRight: 7,
                         }}>
-                        {count[item.id] || 0}
-                      </Text>
+                        <Text
+                          style={{
+                            fontWeight: 'bold',
+                            color: 'black',
+                            fontSize: 18,
+                          }}>
+                          {count[item.id] || 0}
+                        </Text>
+                      </View>
+                      <TouchableOpacity
+                        onPress={() => {
+                          increase(item.id, item);
+                        }}
+                        style={styles.button}>
+                        <Text
+                          style={{
+                            fontWeight: 'bold',
+                            color: 'black',
+                            padding: 5,
+                            fontSize: 18,
+                          }}>
+                          +
+                        </Text>
+                      </TouchableOpacity>
                     </View>
-                    <TouchableOpacity
-                      onPress={() => {
-                        increase(item.id, item);
-                      }}
-                      style={styles.button}>
-                      <Text
-                        style={{
-                          fontWeight: 'bold',
-                          color: 'black',
-                          padding: 5,
-                          fontSize: 18,
-                        }}>
-                        +
-                      </Text>
-                    </TouchableOpacity>
                   </View>
                 </View>
               </View>
-            </View>
-          </>
-        )}
-        keyExtractor={(item, index) => index.toString()}
-      />
-    </View>
+            </>
+          )}
+          keyExtractor={(item, index) => index.toString()}
+        />
+      </View>
+    </>
   );
 };
 

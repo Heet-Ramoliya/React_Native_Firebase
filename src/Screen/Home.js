@@ -10,60 +10,63 @@ import {
 
 const Home = ({navigation}) => {
   return (
-    <View style={styles.main}>
-      <StatusBar barStyle={'light-content'} />
-      <ImageBackground
-        source={require('../../assets/image/homePageImage.jpg')}
-        style={styles.img}>
-        <Text style={styles.heading}>HELLO</Text>
-        <Text style={styles.text}>Welcome to the app</Text>
+    <>
+      <StatusBar backgroundColor="black" />
+      <View style={styles.main}>
+        <StatusBar barStyle={'light-content'} />
+        <ImageBackground
+          source={require('../../assets/image/homePageImage.jpg')}
+          style={styles.img}>
+          <Text style={styles.heading}>HELLO</Text>
+          <Text style={styles.text}>Welcome to the app</Text>
 
-        <View style={styles.button}>
-          <TouchableOpacity
-            onPress={() => {
-              navigation.navigate('Signin');
-            }}
-            style={{
-              padding: 7,
-              backgroundColor: 'blue',
-              borderRadius: 100,
-              margin: 10,
-              backgroundColor: 'white',
-            }}>
-            <Text
+          <View style={styles.button}>
+            <TouchableOpacity
+              onPress={() => {
+                navigation.navigate('Signin');
+              }}
               style={{
-                fontSize: 18,
-                color: 'black',
-                textAlign: 'center',
-                padding: 5,
-                fontWeight: '600',
+                padding: 7,
+                backgroundColor: 'blue',
+                borderRadius: 100,
+                margin: 10,
+                backgroundColor: 'white',
               }}>
-              Sign In
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => navigation.navigate('SignUp')}
-            style={{
-              padding: 7,
-              backgroundColor: 'blue',
-              borderRadius: 100,
-              margin: 15,
-              backgroundColor: 'rgba(43,5,90,255)',
-            }}>
-            <Text
+              <Text
+                style={{
+                  fontSize: 18,
+                  color: 'black',
+                  textAlign: 'center',
+                  padding: 5,
+                  fontWeight: '600',
+                }}>
+                Sign In
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => navigation.navigate('SignUp')}
               style={{
-                fontSize: 18,
-                color: 'white',
-                textAlign: 'center',
-                padding: 5,
-                fontWeight: '600',
+                padding: 7,
+                backgroundColor: 'blue',
+                borderRadius: 100,
+                margin: 15,
+                backgroundColor: 'rgba(43,5,90,255)',
               }}>
-              Sign Up
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </ImageBackground>
-    </View>
+              <Text
+                style={{
+                  fontSize: 18,
+                  color: 'white',
+                  textAlign: 'center',
+                  padding: 5,
+                  fontWeight: '600',
+                }}>
+                Sign Up
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </ImageBackground>
+      </View>
+    </>
   );
 };
 
