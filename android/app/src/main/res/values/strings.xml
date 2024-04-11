@@ -1,3 +1,6 @@
 <resources>
     <string name="app_name">React_Native_Firebase</string>
+    <string name="facebook_app_id">407279802029196</string>
+    <string name="fb_login_protocol_scheme">fb1234</string>
+    <string name="facebook_client_token">1b192a8b09968f25bf3d1d1f09c479b3</string>
 </resources>

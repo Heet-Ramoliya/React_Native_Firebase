@@ -6,7 +6,6 @@ import {
   ToastAndroid,
   TouchableOpacity,
   Image,
-  Alert,
 } from 'react-native';
 import {useEffect, useState} from 'react';
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -18,18 +17,20 @@ import {
   GoogleSigninButton,
   statusCodes,
 } from '@react-native-google-signin/google-signin';
+import {LoginManager, AccessToken} from 'react-native-fbsdk-next';
 
 const Signin = ({navigation}) => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [showpassword, setShowpassword] = useState(true);
+  const [userinfo, setUserinfo] = useState(null);
+
   useEffect(() => {
     GoogleSignin.configure({
       webClientId:
         '52184306944-30pfsdm4stb7lfdb3hl10uc06ui114hl.apps.googleusercontent.com',
     });
   }, []);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [showpassword, setShowpassword] = useState(true);
-  const [userinfo, setUserinfo] = useState(null);
 
   const showPasswordonInputField = () => {
     setShowpassword(!showpassword);
@@ -46,15 +47,15 @@ const Signin = ({navigation}) => {
   const Googlelogin = async () => {
     try {
       await GoogleSignin.hasPlayServices();
-      const userInfo = await GoogleSignin.signIn()
-        .then(() => {
-          console.log('userInfo ==> ', userInfo);
-          console.log('successfully login using google!!');
-          navigation.navigate('DrawerNavigators');
-        })
-        .catch(error => {
-          console.log('error ==> ', error);
-        });
+      const userInfo = await GoogleSignin.signIn();
+      const id = userInfo.user.id;
+      console.log('Google userInfo ==> ', userInfo);
+      console.log('successfully login using google!!');
+      await AsyncStorage.setItem('UserId', id).then(() => {
+        console.log('Successfully set UserId in using Google signin!');
+      });
+      AsyncStorage.setItem('sessionToken', '12345');
+      navigation.navigate('DrawerNavigators');
       setUserinfo(userInfo);
     } catch (error) {
       if (error.code === statusCodes.SIGN_IN_CANCELLED) {
@@ -66,6 +67,50 @@ const Signin = ({navigation}) => {
       } else {
         console.log('else part');
       }
+    }
+  };
+
+  const FacebookLogin = async () => {
+    try {
+      const result = await LoginManager.logInWithPermissions([
+        'public_profile',
+        'email',
+      ]);
+
+      if (result.isCancelled) {
+        throw 'User cancelled the login process';
+      }
+
+      const data = await AccessToken.getCurrentAccessToken();
+
+      if (!data) {
+        throw 'Something went wrong obtaining access token';
+      }
+
+      const facebookCredential = auth.FacebookAuthProvider.credential(
+        data.accessToken,
+      );
+
+      await auth()
+        .signInWithCredential(facebookCredential)
+        .then(userCredential => {
+          const id = userCredential.user.uid;
+          console.log('Successfully logged in with Facebook');
+          AsyncStorage.setItem('UserId', id)
+            .then(() => {
+              console.log('successfully set UserId!');
+            })
+            .catch(error => {
+              console.log('Error in setting userID: ', error);
+            });
+          AsyncStorage.setItem('sessionToken', '12345');
+          navigation.navigate('DrawerNavigators');
+        })
+        .catch(error => {
+          console.log('Error:', error);
+        });
+    } catch (error) {
+      console.log('Error:', error);
     }
   };
 
@@ -275,8 +320,22 @@ const Signin = ({navigation}) => {
           onPress={() => {
             Googlelogin();
           }}
-          // disabled={this.state.isSigninInProgress}
         />
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => {
+            FacebookLogin();
+          }}>
+          <View style={styles.content}>
+            <Icon
+              name="facebook"
+              size={20}
+              color="#ffffff"
+              style={styles.icon}
+            />
+            <Text style={styles.buttonText}>Sign in with Facebook</Text>
+          </View>
+        </TouchableOpacity>
       </View>
     </KeyboardAwareScrollView>
   );
@@ -312,9 +371,31 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(236,240,245,255)',
     fontSize: 15,
     borderRadius: 10,
-    height: 55,
     fontWeight: '500',
     color: 'black',
+  },
+  button: {
+    paddingHorizontal: 10,
+    width: '90%',
+    marginLeft: 20,
+    marginRight: 20,
+    marginBottom: 20,
+    backgroundColor: '#3b5998',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  content: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  icon: {
+    marginRight: 10,
+  },
+  buttonText: {
+    color: '#ffffff',
+    fontSize: 16,
+    fontWeight: 'bold',
+    padding: 4,
   },
 });
 

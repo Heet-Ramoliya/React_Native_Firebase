@@ -1,17 +1,21 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {createDrawerNavigator} from '@react-navigation/drawer';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import {TouchableOpacity} from 'react-native-gesture-handler';
-import {View} from 'react-native';
+// import {TouchableOpacity} from 'react-native-gesture-handler';
+import {View, TouchableOpacity} from 'react-native';
 import TabNavigator from './TabNavigator';
 import AddItems from '../Screen/AddItems';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useRoute} from '@react-navigation/native';
 import MyOrders from '../Screen/MyOrders';
+import {GoogleSignin} from '@react-native-google-signin/google-signin';
+import {LoginManager, AccessToken} from 'react-native-fbsdk';
 
 const Drawer = createDrawerNavigator();
 
 const DrawerNavigators = ({navigation}) => {
+  const [user, setUser] = useState(null);
+
   const route = useRoute();
   const email = route.params?.email;
   const signout = async () => {
@@ -30,11 +34,37 @@ const DrawerNavigators = ({navigation}) => {
         .catch(error => {
           console.log('Error in remove userID: ', error);
         });
+
+      try {
+        await GoogleSignin.signOut()
+          .then(() => {
+            AsyncStorage.removeItem('sessionToken');
+          })
+          .catch(error => {
+            console.log(error);
+          });
+        setUser(null);
+      } catch (error) {
+        console.error(error);
+      }
+      // try {
+      //   await LoginManager.logOut()
+      //     .then(() => {
+      //       AsyncStorage.removeItem('sessionToken');
+      //     })
+      //     .catch(error => {
+      //       console.log(error);
+      //     });
+      //   setUser(null);
+      // } catch (error) {
+      //   console.error(error);
+      // }
       navigation.navigate('Signin');
     } catch (error) {
       console.error('Error removing AsyncStorage item:', error);
     }
   };
+
   return (
     <Drawer.Navigator>
       <Drawer.Screen
