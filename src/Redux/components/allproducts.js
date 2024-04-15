@@ -4,19 +4,47 @@ import {
   StyleSheet,
   Image,
   ScrollView,
-  FlatList,
   TouchableOpacity,
 } from 'react-native';
 import React from 'react';
 import Icon from 'react-native-vector-icons/FontAwesome6';
+import Icons from 'react-native-vector-icons/MaterialCommunityIcons';
+import {addToCart, removeFromCart} from '../action';
+import {useDispatch, useSelector} from 'react-redux';
+import {useEffect} from 'react';
+import {useState} from 'react';
 
 const Allproductdata = () => {
+  const dispatch = useDispatch();
+  const cartItems = useSelector(state => state.reducer);
+
+  const [cartItemsdata, setCartitemsdata] = useState({});
+  const [isAdded, setIsAdded] = useState(false);
+
+  const handleAddToCart = item => {
+    dispatch(addToCart(item));
+    setCartitemsdata(item);
+  };
+
+  const handleRemoveFromCart = item => {
+    dispatch(removeFromCart(item.id));
+  };
+
+  // useEffect(() => {
+  //   if (cartItems && cartItems.length) {
+  //     cartItems.forEach(element => {
+  //       if (element.name === cartItemsdata.name) {
+  //         setIsAdded(true);
+  //       }
+  //     });
+  //   }
+  // }, [cartItems, cartItemsdata]);
+
   const products = [
     {
       id: 1,
       name: 'Samsung s22 ultra',
       price: 35000,
-      color: 'black',
       image:
         'https://lh3.googleusercontent.com/EqZxdzf_OWuPwPS6ERcjdbR7VaZVCvOwUi5KwP1fu8-_3NRyiT3cfFb4jImhE3do7qovhd5bHFp4N6gDi6LAUYqt53QQ4NyVU8U',
     },
@@ -24,7 +52,6 @@ const Allproductdata = () => {
       id: 2,
       name: 'iphone 13',
       price: 135000,
-      color: 'white',
       image:
         'https://www.mobilehub.co.ke/wp-content/uploads/2023/09/apple-iphone-11-pro-maxv-1-300x300.png',
     },
@@ -32,7 +59,6 @@ const Allproductdata = () => {
       id: 3,
       name: 'OnePlus Mobile',
       price: 40000,
-      color: 'blue',
       image:
         'https://img.etimg.com/photo/msid-99124255,imgsize-14640/OnePlus10Pro5G.jpg',
     },
@@ -40,7 +66,6 @@ const Allproductdata = () => {
       id: 4,
       name: 'Samsung s22 ultra',
       price: 35000,
-      color: 'black',
       image:
         'https://lh3.googleusercontent.com/EqZxdzf_OWuPwPS6ERcjdbR7VaZVCvOwUi5KwP1fu8-_3NRyiT3cfFb4jImhE3do7qovhd5bHFp4N6gDi6LAUYqt53QQ4NyVU8U',
     },
@@ -48,7 +73,6 @@ const Allproductdata = () => {
       id: 5,
       name: 'iphone 13',
       price: 135000,
-      color: 'white',
       image:
         'https://www.mobilehub.co.ke/wp-content/uploads/2023/09/apple-iphone-11-pro-maxv-1-300x300.png',
     },
@@ -56,7 +80,6 @@ const Allproductdata = () => {
       id: 6,
       name: 'OnePlus Mobile',
       price: 40000,
-      color: 'blue',
       image:
         'https://img.etimg.com/photo/msid-99124255,imgsize-14640/OnePlus10Pro5G.jpg',
     },
@@ -64,7 +87,6 @@ const Allproductdata = () => {
       id: 7,
       name: 'Samsung s22 ultra',
       price: 35000,
-      color: 'black',
       image:
         'https://lh3.googleusercontent.com/EqZxdzf_OWuPwPS6ERcjdbR7VaZVCvOwUi5KwP1fu8-_3NRyiT3cfFb4jImhE3do7qovhd5bHFp4N6gDi6LAUYqt53QQ4NyVU8U',
     },
@@ -72,7 +94,6 @@ const Allproductdata = () => {
       id: 8,
       name: 'iphone 13',
       price: 135000,
-      color: 'white',
       image:
         'https://www.mobilehub.co.ke/wp-content/uploads/2023/09/apple-iphone-11-pro-maxv-1-300x300.png',
     },
@@ -80,25 +101,40 @@ const Allproductdata = () => {
       id: 9,
       name: 'OnePlus Mobile',
       price: 40000,
-      color: 'blue',
       image:
         'https://img.etimg.com/photo/msid-99124255,imgsize-14640/OnePlus10Pro5G.jpg',
     },
   ];
 
   const renderProducts = () => {
-    return products.map(product => (
-      <View key={product.id} style={styles.itemContainer}>
-        <Image source={{uri: product.image}} style={styles.image} />
-        <View style={styles.textContainer}>
-          <Text style={styles.name}>{product.name}</Text>
-          <Text style={styles.price}>${product.price}</Text>
+    return products.map(product => {
+      const itemInCart = cartItems.some(item => item.id === product.id);
+
+      return (
+        <View key={product.id} style={styles.itemContainer}>
+          <Image source={{uri: product.image}} style={styles.image} />
+          <View style={styles.textContainer}>
+            <Text style={styles.name}>{product.name}</Text>
+            <Text style={styles.price}>${product.price}</Text>
+          </View>
+          {itemInCart ? (
+            <TouchableOpacity
+              onPress={() => {
+                handleRemoveFromCart(product);
+              }}>
+              <Icons name="delete" size={24} color="black" />
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity
+              onPress={() => {
+                handleAddToCart(product);
+              }}>
+              <Icon name="cart-plus" size={24} color="black" />
+            </TouchableOpacity>
+          )}
         </View>
-        <TouchableOpacity>
-          <Icon name="cart-plus" size={24} color="black" />
-        </TouchableOpacity>
-      </View>
-    ));
+      );
+    });
   };
 
   return <ScrollView style={styles.container}>{renderProducts()}</ScrollView>;

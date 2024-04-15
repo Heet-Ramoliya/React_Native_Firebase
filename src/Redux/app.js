@@ -4,7 +4,7 @@ import Header from './screen/Header';
 import Product from './screen/Product';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 
-const app = () => {
+const Apps = () => {
   return (
     <View style={{flex: 1}}>
       <Header />
@@ -15,4 +15,4 @@ const app = () => {
   );
 };
 
-export default app;
+export default Apps;
