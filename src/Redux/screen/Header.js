@@ -11,6 +11,7 @@ const Header = () => {
     if (Array.isArray(cartData)) {
       setCartItems(cartData.length);
     }
+    console.log('cartData ==> ', cartData);
   }, [cartData]);
 
   return (

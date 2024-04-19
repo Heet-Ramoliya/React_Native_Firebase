@@ -16,7 +16,7 @@ messaging().getInitialNotification(async remoteMessage => {
 
 const AppRedux = () => (
   <Provider store={store}>
-    <Apps />
+    <Apps /> 
   </Provider>
 );
 
