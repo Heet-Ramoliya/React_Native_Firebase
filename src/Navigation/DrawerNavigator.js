@@ -10,6 +10,8 @@ import {useRoute} from '@react-navigation/native';
 import MyOrders from '../Screen/MyOrders';
 import {GoogleSignin} from '@react-native-google-signin/google-signin';
 import {LoginManager, AccessToken} from 'react-native-fbsdk';
+import Chat from '../Screen/Chat';
+import ChatHomePage from '../Screen/ChatHomePage';
 
 const Drawer = createDrawerNavigator();
 
@@ -101,6 +103,7 @@ const DrawerNavigators = ({navigation}) => {
       />
       <Drawer.Screen name="AddItems" component={AddItems} />
       <Drawer.Screen name="MyOrders" component={MyOrders} />
+      <Drawer.Screen name="ChatHomePage" component={ChatHomePage} />
     </Drawer.Navigator>
   );
 };

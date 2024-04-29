@@ -15,6 +15,8 @@ import AddToCart from '../Screen/AddToCart';
 import Invoice from '../Screen/Invoice';
 import MyOrders from '../Screen/MyOrders';
 import MobileVerification from '../Screen/MobileVerification';
+import Chat from '../Screen/Chat';
+import ChatHomePage from '../Screen/ChatHomePage';
 
 const Stack = createNativeStackNavigator();
 
@@ -93,6 +95,16 @@ const StackNavigator = () => {
           name="MobileVerification"
           component={MobileVerification}
           options={{headerShown: true, title: 'Mobile Verification'}}
+        />
+        <Stack.Screen
+          name="Chat"
+          component={Chat}
+          options={{headerShown: true}}
+        />
+        <Stack.Screen
+          name="ChatHomePage"
+          component={ChatHomePage}
+          options={{headerShown: true}}
         />
       </Stack.Navigator>
     </NavigationContainer>
