@@ -5,6 +5,7 @@ import messaging from '@react-native-firebase/messaging';
 import Apps from './src/Redux/app';
 import {Provider} from 'react-redux';
 import store from './src/Redux/store';
+import NativeModule from './src/Screen/NativeModule';
 
 messaging().setBackgroundMessageHandler(async remoteMessage => {
   console.log('Message handled in the background!', remoteMessage);
@@ -22,4 +23,4 @@ const AppRedux = () => (
 
 // AppRegistry.registerComponent(appName, () => AppRedux);
 
-AppRegistry.registerComponent(appName, () => App);
+AppRegistry.registerComponent(appName, () => NativeModule);
